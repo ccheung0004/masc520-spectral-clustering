@@ -4,18 +4,15 @@ from sklearn.decomposition import PCA
 
 
 def apply_pca(X, n_components):
-    """
-    Reduce the dataset to n_components dimensions
-    using Principal Component Analysis.
-    """
 
-    pca = PCA(n_components=n_components)
+    pca = PCA(
+        n_components=n_components,
+        svd_solver="full"
+    )
 
     X_reduced = pca.fit_transform(X)
 
     return X_reduced, pca
-
-
 def get_explained_variance(pca):
     """
     Return the explained variance ratio of each

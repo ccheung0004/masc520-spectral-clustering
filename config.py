@@ -28,3 +28,13 @@ SPECTRAL_ASSIGN_LABELS = "kmeans"
 RESULTS_DIR = ROOT_DIR / "results"
 FIGURES_DIR = RESULTS_DIR / "figures"
 METRICS_DIR = RESULTS_DIR / "metrics"
+
+METRICS = [
+    "ARI",
+    "NMI",
+    "Accuracy",
+    "Silhouette",
+    "Runtime",
+    "PCA Runtime",
+    "Total Runtime"
+]
