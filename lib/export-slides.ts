@@ -95,18 +95,17 @@ export async function exportSlides(deck: SlideDeck, topic: string, asBlob = fals
     const bold=opts.bold===true;
     const fs=safeFont(text,rect,opts.fontSize??18,minSize,face,bold);
     const {x,y,w,h}=rect;
-    
     slide.addText(text, {
-  x, y, w, h,
-  margin: 0,
-  fontFace: face,
-  color: NAVY,
-  valign: "mid",
-  breakLine: false,
-  ...opts,
-  fontSize: fs,
-  fit: "shrink"
-});
+      x, y, w, h,
+      margin: 0,
+      fontFace: face,
+      color: NAVY,
+      valign: "mid",
+      breakLine: false,
+      ...opts,
+      fontSize: fs,
+      fit: "shrink"
+    });
 
   }
   async function equationImage(tex:string):Promise<{data:string;ratio:number}> {
