@@ -1,0 +1,125 @@
+common control
+```php
+$variant = rand(0,11)
+$truepart = $variant%4
+$claimset = floor($variant/4)
+$isTrueA = ($truepart==0)
+$isTrueB = ($truepart==1)
+$isTrueC = ($truepart==2)
+$isTrueD = ($truepart==3)
+
+$mb = rand(2,19) where ($mb != 7)
+$nf = rand(2,19) where ($nf != 7)
+$mbp1 = $mb+1
+
+$falseA = array(
+  "A horizontal line has a slope of `1`.",
+  "A horizontal line has an undefined slope.",
+  "A horizontal line has a negative slope."
+)
+$statementAoptions = array($falseA[$claimset], "A horizontal line has a slope of `0`.")
+$statementA = $statementAoptions[$isTrueA]
+
+$falseB = array(
+  "Whenever a line has slope `m`, its `y`-intercept must be a number different from `m`.",
+  "No line can have a `y`-intercept numerically equal to its slope.",
+  "For every line `y = mx + b`, the value of `b` must be different from `m`."
+)
+$statementBoptions = array($falseB[$claimset], "A line can have a `y`-intercept numerically equal to its slope.")
+$statementB = $statementBoptions[$isTrueB]
+
+$falseC = array(
+  "Every line can be written in slope-intercept form.",
+  "A vertical line can be written in slope-intercept form.",
+  "Only horizontal lines can be written in slope-intercept form."
+)
+$statementCoptions = array($falseC[$claimset], "Every non-vertical line can be written in slope-intercept form.")
+$statementC = $statementCoptions[$isTrueC]
+
+$falseD = array(
+  "The only point lying on the graph of `x = $nf` is `($nf, 0)`.",
+  "The graph of `x = $nf` is the horizontal line `y = $nf`.",
+  "The graph of `x = $nf` is the vertical line `x = -$nf`."
+)
+$statementDoptions = array($falseD[$claimset], "The graph of `x = $nf` is a vertical line.")
+$statementD = $statementDoptions[$isTrueD]
+
+$anstypes = array("choices","choices","choices","choices")
+
+$questions[0] = array(
+  "This statement is true as written.",
+  "This statement is false; a horizontal line has a slope of `0`.",
+  "This statement is false; only a horizontal line through the origin has a slope of `0`.",
+  "This statement is false; a horizontal line has a slope of `-1`."
+)
+$answer[0] = 1-$isTrueA
+
+$questions[1] = array(
+  "This statement is true as written.",
+  "This statement is false; a line such as `y = $mb x + $mb` has slope `$mb` and `y`-intercept `$mb`, so a line can have them equal.",
+  "This statement is false; the line `y = $mb x - $mb` has slope `$mb` and `y`-intercept `-$mb`, so they must always be opposites.",
+  "This statement is false; the line `y = $mbp1 x + $mb` has slope `$mbp1` and `y`-intercept `$mb`, so the intercept must always be one less than the slope."
+)
+$answer[1] = 1-$isTrueB
+
+$questions[2] = array(
+  "This statement is true as written.",
+  "This statement is false; every non-vertical line can be written in slope-intercept form, but a vertical line cannot.",
+  "This statement is false; only horizontal lines can be written in slope-intercept form.",
+  "This statement is false; a vertical line such as `x = $nf` can be written as `y = $nf x + b`."
+)
+$answer[2] = 1-$isTrueC
+
+$questions[3] = array(
+  "This statement is true as written.",
+  "This statement is false; the graph of `x = $nf` is a vertical line.",
+  "This statement is false; the graph of `x = $nf` is a horizontal line.",
+  "This statement is false; the graph of `x = $nf` is the single point `(0, $nf)`."
+)
+$answer[3] = 1-$isTrueD
+
+$partacorrect = $questions[0][$answer[0]]
+$partbcorrect = $questions[1][$answer[1]]
+$partccorrect = $questions[2][$answer[2]]
+$partdcorrect = $questions[3][$answer[3]]
+```
+
+question
+```swift
+For each statement below, select the option that correctly evaluates it: whether it is true as written, or, if it is false, what the corrected statement should be.
+
+a. $statementA<br/>
+$answerbox[0]
+
+b. $statementB<br/>
+$answerbox[1]
+
+c. $statementC<br/>
+$answerbox[2]
+
+d. $statementD<br/>
+$answerbox[3]
+```
+
+explanation
+```
+Step 1: Find the slope of a horizontal line.<br/>
+A horizontal line neither rises nor falls, so its slope is `0`.<br/>
+Therefore, the answer to part (a) is:<br/>
+$partacorrect
+
+Step 2: Test whether a slope can equal a `y`-intercept.<br/>
+The line `y = $mb x + $mb` has slope `$mb` and `y`-intercept `$mb` — the same number. Thus, a line can have a `y`-intercept numerically equal to its slope.<br/>
+Therefore, the answer to part (b) is:<br/>
+$partbcorrect
+
+Step 3: Check which lines have a slope-intercept form.<br/>
+A non-vertical line has a defined slope `m` and a `y`-intercept `b`, so it can be written as `y = mx + b`. A vertical line has undefined slope and cannot be written in this form.<br/>
+Therefore, the answer to part (c) is:<br/>
+$partccorrect
+
+Step 4: Identify the graph of `x = $nf`.<br/>
+Every point of the form `($nf, y)` satisfies `x = $nf`, so the graph is the vertical line with fixed `x`-coordinate `$nf`.<br/>
+Therefore, the answer to part (d) is:<br/>
+$partdcorrect
+```
