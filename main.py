@@ -1,6 +1,8 @@
 
-import numpy as np
-import matplotlib.pyplot as plt
+import time
+import pandas as pd
+
+from config import METRICS_DIR
 
 from src.data_loader import load_data
 from src.preprocessing import preprocess_data
@@ -11,96 +13,100 @@ from src.clustering import (
     apply_spectral_clustering
 )
 
+from src.evaluation import evaluate_clustering
+
 
 def main():
 
-    # Load and preprocess data
+    # Load and preprocess dataset
     X, y = load_data()
     X = preprocess_data(X)
 
-    print("Original dataset shape:", X.shape)
+    print("Original shape:", X.shape)
 
     # Apply PCA
+    start_time = time.perf_counter()
+
     X_pca, pca = apply_pca(X, 20)
 
-    print("PCA dataset shape:", X_pca.shape)
+    pca_runtime = time.perf_counter() - start_time
 
-    # Experiment 1: K-Means without PCA
-    print("\nRunning K-Means...")
+    print("PCA shape:", X_pca.shape)
 
-    labels_kmeans, _, time_kmeans = apply_kmeans(X)
-
-    # Experiment 2: K-Means with PCA
-    print("Running K-Means with PCA...")
-
-    labels_kmeans_pca, _, time_kmeans_pca = (
-        apply_kmeans(X_pca)
-    )
-
-    # Experiment 3: Spectral without PCA
-    print("Running Spectral Clustering...")
-
-    labels_spectral, _, time_spectral = (
-        apply_spectral_clustering(X)
-    )
-
-    # Experiment 4: Spectral with PCA
-    print("Running Spectral Clustering with PCA...")
-
-    labels_spectral_pca, _, time_spectral_pca = (
-        apply_spectral_clustering(X_pca)
-    )
-
-    # Display computational runtimes
-    print("\n--- Clustering Runtimes ---")
-
-    print(f"K-Means: {time_kmeans:.4f} seconds")
-    print(f"K-Means + PCA: {time_kmeans_pca:.4f} seconds")
-
-    print(f"Spectral: {time_spectral:.4f} seconds")
-    print(f"Spectral + PCA: {time_spectral_pca:.4f} seconds")
-
-    # Create a common 2D projection for visualization
-    X_2d, _ = apply_pca(X, 2)
-
-    fig, axes = plt.subplots(
-        2, 3,
-        figsize=(16, 10)
-    )
-
+    # Define experiments
     experiments = [
-        ("True Labels", y),
-        ("K-Means", labels_kmeans),
-        ("K-Means + PCA", labels_kmeans_pca),
-        ("Spectral", labels_spectral),
-        ("Spectral + PCA", labels_spectral_pca)
+        ("K-Means", X, apply_kmeans, 0),
+        ("K-Means + PCA", X_pca, apply_kmeans, pca_runtime),
+        ("Spectral", X, apply_spectral_clustering, 0),
+        (
+            "Spectral + PCA",
+            X_pca,
+            apply_spectral_clustering,
+            pca_runtime
+        )
     ]
 
-    for ax, (title, labels) in zip(
-        axes.flatten(), experiments
-    ):
+    results = []
 
-        ax.scatter(
-            X_2d[:, 0],
-            X_2d[:, 1],
-            c=labels,
-            cmap="tab10",
-            s=5,
-            alpha=0.6,
-            vmin=-0.5,
-            vmax=9.5
+    # Run experiments
+    for name, data, algorithm, pca_time in experiments:
+
+        print(f"\nRunning {name}...")
+
+        labels, model, runtime = algorithm(data)
+
+        metrics = evaluate_clustering(
+            X,
+            y,
+            labels,
+            runtime
         )
 
-        ax.set_title(title)
-        ax.set_xlabel("Principal Component 1")
-        ax.set_ylabel("Principal Component 2")
+        metrics["Algorithm"] = name
+        metrics["Dimensions"] = data.shape[1]
+        metrics["PCA Runtime"] = pca_time
+        metrics["Total Runtime"] = runtime + pca_time
 
-    axes[1, 2].axis("off")
+        results.append(metrics)
 
-    fig.suptitle("Comparison of Clustering Algorithms")
+    # Convert results into a DataFrame
+    df = pd.DataFrame(results)
 
-    plt.tight_layout()
-    plt.show()
+    df = df[
+        [
+            "Algorithm",
+            "Dimensions",
+            "ARI",
+            "NMI",
+            "Accuracy",
+            "Silhouette",
+            "Runtime",
+            "PCA Runtime",
+            "Total Runtime"
+        ]
+    ]
+
+    print("\n--- Experiment Results ---\n")
+
+    print(
+        df.to_string(
+            index=False,
+            float_format=lambda x: f"{x:.4f}"
+        )
+    )
+
+    # Save results
+    METRICS_DIR.mkdir(
+        parents=True,
+        exist_ok=True
+    )
+
+    df.to_csv(
+        METRICS_DIR / "preliminary_results.csv",
+        index=False
+    )
+
+    print("\nResults successfully saved!")
 
 
 if __name__ == "__main__":
